@@ -241,7 +241,6 @@
       1. superset of regular language
       2. start at start node. Then you replace each rule that matches recursivly until hit a terminal rule
       3. This is what Lark parses
-      4. Can be describe any programming language
     ```)
   ],
   figure: [
@@ -325,7 +324,7 @@
 
 #centered-slide(title: "Creating the grammar: drop comments")[
   ```lark
-  // This is a omments in Lark
+  // This is a comments in Lark
 
   %ignore /;.*/  // <- Look a REGEX
   ```
