@@ -1,0 +1,6 @@
+[submodule "catppuccin"]
+	path = catppuccin
+	url = git@github.com:danjones1618/typst-catppuccin.git
+[submodule "typst-svg-emoji"]
+	path = typst-svg-emoji
+	url = git@github.com:polazarus/typst-svg-emoji.git

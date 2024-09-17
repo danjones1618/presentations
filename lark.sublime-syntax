@@ -1,0 +1,142 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Lark grammar
+file_extensions:
+  - lark
+scope: source.lark
+contexts:
+  main:
+    - include: comment
+    - match: '[ \t]*(\?|!)?(\b(?:\w|[ \t]|[\-_0-9])+\b)((\.)([+-]?\d+))?[ \t]*(:)'
+      captures:
+        "1": keyword.operator.other.lark
+        "2": entity.name.function.lark
+        "4": keyword.operator.priority.lark
+        "5": constant.numeric.integer.lark
+        "6": keyword.operator.definition.lark
+      push:
+        - meta_scope: meta.syntax-rule.lark
+        - match: (?=\n)
+          pop: true
+        - include: comment
+        - include: subrules
+    - match: '[ \t]*(\|)'
+      captures:
+        "1": keyword.operator.alternative.lark
+      push:
+        - meta_scope: meta.syntax-rule-alternative.lark
+        - match: (?=\n)
+          pop: true
+        - include: comment
+        - include: subrules
+    - match: "%ignore|%declare"
+      push:
+        - meta_scope: meta.ignore.lark
+        - match: (?=\n)
+          pop: true
+        - include: comment
+        - include: subrules
+    - match: "%import"
+      push:
+        - meta_scope: meta.import.lark
+        - match: (?=\n)
+          pop: true
+        - include: comment
+        - include: subrules
+  comment:
+    - match: '(#|//)[^\n]*'
+      push:
+        - meta_scope: comment.line.lark
+        - match: (?=\n)
+          pop: true
+  double-quote-string:
+    - match: (?<!\\)(?:\\\\)*(")
+      push:
+        - meta_scope: string.quoted.double.lark
+        - match: (?<!\\)(?:\\\\)*(")(i?)
+          captures:
+            "2": keyword.control.regexp-option.lark
+          pop: true
+  group:
+    - match: \(
+      push:
+        - match: \)
+          pop: true
+        - include: subrules
+  invalid:
+    - match: '\([ \t]*[*:/][ \t]*\)'
+      scope: invalid.illegal.lark
+  non-terminal:
+    - match: "[a-z_]+"
+      scope: variable.parameter.c++
+  operator:
+    - include: operator-literal-range
+    - include: operator-alternative
+    - include: operator-arrow
+    - include: operator-zero-or-more
+    - include: operator-one-or-more
+    - include: operator-optional
+  operator-alternative:
+    - match: \|
+      scope: keyword.operator.alternative.lark
+  operator-arrow:
+    - match: "->"
+      scope: keyword.operator.alias.lark
+  operator-literal-range:
+    - match: \.\.
+      scope: keyword.operator.range.lark
+  operator-one-or-more:
+    - match: \+
+      scope: keyword.operator.one-or-more.lark
+  operator-optional:
+    - match: \?
+      scope: keyword.operator.optional.lark
+  operator-zero-or-more:
+    - match: \*
+      scope: keyword.operator.zero-or-more.lark
+  optional-group:
+    - match: '\['
+      push:
+        - match: '\]'
+          pop: true
+        - include: subrules
+  regex-string:
+    - match: (?<!\\)(?>\\\\)*/(?!/)
+      push:
+        - meta_scope: source.regexp.lark
+        - match: '(?<!\\)(?>\\\\)*(/)(?!/)([imslux]*)'
+          captures:
+            "1": string.quoted.other.lark
+            "2": keyword.control.regexp-option.lark
+          pop: true
+        - include: scope:source.regexp.python
+  repetition-numbered:
+    - match: '(~)[ \t]*(\d+)[ \t]*((\.\.)[ \t]*(\d+))?'
+      captures:
+        "1": keyword.operator.quantifier.lark
+        "2": constant.numeric.integer.lark
+        "4": keyword.operator.quantifier.lark
+        "5": constant.numeric.integer.lark
+  single-quote-string:
+    - match: (?<!\\)(?:\\\\)*(')
+      push:
+        - meta_scope: string.quoted.single.lark
+        - match: (?<!\\)(?:\\\\)*(')(i?)
+          captures:
+            "2": keyword.control.regexp-option.lark
+          pop: true
+  subrules:
+    - include: invalid
+    - include: optional-group
+    - include: group
+    - include: repetition-numbered
+    - include: non-terminal
+    - include: terminal
+    - include: operator
+    - include: regex-string
+    - include: single-quote-string
+    - include: double-quote-string
+  terminal:
+    - match: "[A-Z_]+"
+      scope: keyword.control.c
